@@ -1,0 +1,25 @@
+    Sudoku is a logic-based, combinatorial number-placement puzzle game.
+The objective is to fill a 9×9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids
+that compose the grid contain all of the digits from 1 to 9. The puzzle setter provides a partially completed grid,
+which for a well-posed puzzle has a single solution.
+    The game guarantees that each puzzle has a unique solution.
+    The game generates a new puzzle each time you start a new game.
+    The game has a simple and intuitive interface, with a clean design that allows you to focus on the game.
+
+    TIPS!
+
+    - Use arrows to move around the grid and type a number to place it in the cell or
+    - Click on the desired cell and use the numbered buttons to enter your solution.
+    - You can save your progress by clicking the save button and load it later.
+    - Use the check button to see if your solution is correct. The game will highlight the wrong cells.
+    - If you get stuck, you can use the hint button to reveal a correct number.
+    - If you want to start over, click the reset button.
+    - Use the undo button to undo your last move.
+    - If you want to change the look of the game, you can choose between different colors using the themes button.
+
+    For any issues or suggestions, you can contact me at
+    example@email.com
+
+    Good luck and have fun!
+
+    Terebent Roxana - 2025

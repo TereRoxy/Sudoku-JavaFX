@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.MainWindowController">
+  <HBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0">
+    <VBox alignment="TOP_CENTER" fillWidth="false" prefHeight="600.0" prefWidth="575.0">
+      <Label text="Sudoku" textAlignment="CENTER">
+        <font>
+          <Font name="Courier New Bold" size="30.0" />
+        </font>
+        <VBox.margin>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Label>
+      <GridPane fx:id="sudokuGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="555.0" maxWidth="555.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="450.0" VBox.vgrow="NEVER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <VBox.margin>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </GridPane>
+      <HBox fx:id="numberButtons" alignment="CENTER" spacing="5.0">
+        <Button fx:id="btn1" prefHeight="40.0" prefWidth="40.0" text="1">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn2" prefHeight="40.0" prefWidth="40.0" text="2">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn3" prefHeight="40.0" prefWidth="40.0" text="3">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn4" prefHeight="40.0" prefWidth="40.0" text="4">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn5" prefHeight="40.0" prefWidth="40.0" text="5">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn6" prefHeight="40.0" prefWidth="40.0" text="6">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn7" prefHeight="40.0" prefWidth="40.0" text="7">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn8" prefHeight="40.0" prefWidth="40.0" text="8">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="btn9" prefHeight="40.0" prefWidth="40.0" text="9">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+        <Button fx:id="deleteBtn" prefHeight="40.0" prefWidth="40.0" text="X">
+          <font>
+            <Font name="Courier New Bold" size="18.0" />
+          </font>
+        </Button>
+      </HBox>
+         <HBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </HBox.margin>
+    </VBox>
+    <VBox alignment="TOP_CENTER" fillWidth="false" prefHeight="580.0" prefWidth="218.0">
+      <Label fx:id="timerLabel" text="00:00" textAlignment="CENTER">
+        <font>
+          <Font name="Courier New Bold" size="24.0" />
+        </font>
+        <VBox.margin>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Label>
+      <MenuButton fx:id="newGameBtn" text="New Game">
+        <items>
+          <MenuItem text="Novice" />
+          <MenuItem text="Easy" />
+          <MenuItem text="Medium" />
+          <MenuItem text="Hard" />
+          <MenuItem text="Very Hard" />
+        </items>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+      </MenuButton>
+      <Button fx:id="saveGameBtn" prefWidth="150.0" text="Save game">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <Button fx:id="loadGameBtn" prefWidth="150.0" text="Load a game">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <GridPane alignment="CENTER" maxWidth="150.0" prefWidth="150.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <Button fx:id="undoBtn" prefWidth="70.0" text="Undo">
+          <font>
+            <Font name="Courier New Bold" size="14.0" />
+          </font>
+          <GridPane.margin>
+            <Insets right="5.0" />
+          </GridPane.margin>
+        </Button>
+        <Button fx:id="redoBtn" prefWidth="70.0" text="Redo" GridPane.columnIndex="1">
+          <font>
+            <Font name="Courier New Bold" size="14.0" />
+          </font>
+          <GridPane.margin>
+            <Insets left="5.0" />
+          </GridPane.margin>
+        </Button>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </GridPane>
+      <Button fx:id="resetBtn" prefWidth="150.0" text="Reset">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <Button fx:id="showHintBtn" prefWidth="150.0" text="Show Hint">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <Label fx:id="availableHintsLabel" text="Available Hints: 3" textAlignment="CENTER">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Label>
+      <Button fx:id="checkSolutionBtn" prefWidth="150.0" text="Check Solution">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <Button fx:id="themesBtn" prefWidth="150.0" text="Themes">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <Button fx:id="aboutBtn" prefWidth="150.0" text="About">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+      <Button fx:id="exitBtn" prefWidth="150.0" text="Exit">
+        <font>
+          <Font name="Courier New Bold" size="14.0" />
+        </font>
+        <VBox.margin>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+      </Button>
+         <HBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </HBox.margin>
+    </VBox>
+  </HBox>
+</VBox>
