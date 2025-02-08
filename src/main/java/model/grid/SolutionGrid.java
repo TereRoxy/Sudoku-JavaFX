@@ -1,17 +1,8 @@
 package model.grid;
-
-import java.util.StringTokenizer;
-
-public class SolutionGrid implements IGrid {
-    private int[][] grid;
+public class SolutionGrid extends Grid {
 
     public SolutionGrid(){
-        grid = new int[9][9];
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
-                grid[i][j] = 0;
-            }
-        }
+        super();
         populate();
     }
 
@@ -35,7 +26,7 @@ public class SolutionGrid implements IGrid {
             for (int col = 0; col < 9; col++) {
                 if (grid[row][col] == 0) {
                     for (int num = 1; num <= 9; num++) {
-                        if (isValid(row, col, num)) {
+                        if (isValid(this.grid, row, col, num)) {
                             grid[row][col] = num;
                             if (solve()) {
                                 return true;
@@ -50,74 +41,9 @@ public class SolutionGrid implements IGrid {
         return true;
     }
 
-    private boolean isValid(int row, int col, int num) {
-        for (int i = 0; i < 9; i++) {
-            if (grid[row][i] == num || grid[i][col] == num) {
-                return false;
-            }
-        }
-        int startRow = row - row % 3;
-        int startCol = col - col % 3;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (grid[startRow + i][startCol + j] == num) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private void populate(){
+    public void populate(){
         generateSeed();
         solve();
     }
-
-    @Override
-    public int[][] getGrid() {
-        return grid;
-    }
-
-    @Override
-    public String toXML() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("    <grid>\n");
-        for (int[] row : grid) {
-            sb.append("      <row>");
-            for (int cell : row) {
-                sb.append(cell).append(" ");
-            }
-            sb.deleteCharAt(sb.length() - 1); // Remove trailing space
-            sb.append("</row>\n");
-        }
-        sb.append("    </grid>\n");
-        return sb.toString();
-    }
-
-    @Override
-    public int[][] fromXML(String xml) {
-        int[][] newGrid = new int[9][9];
-        String[] rows = xml.trim().split("\n");
-
-        for (int i = 0; i < 9; i++) {
-            String row = rows[i].replace("<row>", "").replace("</row>", "").trim();
-            String[] cells = row.split(" ");
-            for (int j = 0; j < 9; j++) {
-                newGrid[i][j] = Integer.parseInt(cells[j]);
-            }
-        }
-        return newGrid;
-    }
-
-    @Override
-    public void setGrid(int[][] grid) {
-        this.grid = grid;
-    }
-
-//    public SolutionGrid deepCopy() {
-//        SolutionGrid sg = new SolutionGrid();
-//        sg.setGrid(grid);
-//        return sg;
-//    }
 
 }

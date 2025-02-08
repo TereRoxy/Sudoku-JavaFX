@@ -19,8 +19,8 @@ public class Repository implements IRepository {
     //TODO: A repository should have a method to save the repository to a file
     //TODO: A repository should have a method to load the repository from a file
 
-    private List<Puzzle> puzzles;
-    private String fileName;
+    private final List<Puzzle> puzzles;
+    private final String fileName;
 
     public Repository(String fileName) {
         this.puzzles = new ArrayList<>();

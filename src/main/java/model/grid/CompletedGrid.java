@@ -3,11 +3,9 @@ package model.grid;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
-import java.util.StringTokenizer;
-
 public class CompletedGrid implements IGrid {
-    private IntegerProperty[][] grid; // Use IntegerProperty instead of int
-    private PuzzleGrid pg;
+    private final IntegerProperty[][] grid;
+    private final PuzzleGrid pg;
 
     public CompletedGrid(PuzzleGrid pg) {
         this.pg = pg;
@@ -35,7 +33,7 @@ public class CompletedGrid implements IGrid {
     public void setGrid(int[][] grid) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                this.grid[i][j].set(grid[i][j]); // Set values from int array
+                this.grid[i][j].set(grid[i][j]);
             }
         }
     }
@@ -85,17 +83,6 @@ public class CompletedGrid implements IGrid {
         }
     }
 
-//    public CompletedGrid deepCopy() {
-//        CompletedGrid cg = new CompletedGrid(pg);
-//        int[][] newGrid = new int[9][9];
-//        for (int i = 0; i < 9; i++) {
-//            for (int j = 0; j < 9; j++) {
-//                newGrid[i][j] = grid[i][j].get(); // Get value from IntegerProperty
-//            }
-//        }
-//        cg.setGrid(newGrid);
-//        return cg;
-//    }
 
     public void setCell(int row, int col, int value) {
         grid[row][col].set(value); // Set value using IntegerProperty

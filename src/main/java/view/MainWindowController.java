@@ -19,13 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-
 public class MainWindowController {
-
-    //TODO: menubar --> new game(difficulty level), save(input name), load*, themes, about, exit*
-    //TODO: toolbar --> show hint(remaining hints), solve*, reset*, undo, redo, pencil mode
-    //TODO: controls --> grid, number/clear buttons, status bar(elapsed time, remaining cells)
-    //print puzzle --> to printer, to pdf, to image, to excel file
 
     @FXML
     private Label timerLabel;
@@ -58,13 +52,12 @@ public class MainWindowController {
     @FXML
     private HBox numberButtons;
 
-    PuzzleController puzzleController = null;
-    IRepository repository = null;
-
-    Timeline timer = null;
-    private int secondsElapsed = 0;
-    TextField lastFocused = null;
-    GridPanelView gridPanelView = null;
+    private PuzzleController puzzleController;
+    private IRepository repository;
+    private Timeline timer;
+    private int secondsElapsed;
+    private TextField lastFocused;
+    private GridPanelView gridPanelView;
 
     public MainWindowController() {}
 
@@ -78,7 +71,11 @@ public class MainWindowController {
 
     @FXML
     private void initialize() {
-        // Initialize the controller and set up event handlers
+        setupEventHandlers();
+        setupTimer();
+    }
+
+    private void setupEventHandlers() {
         newGameBtn.getItems().forEach(item -> item.setOnAction(_ -> handleNewGame(item)));
         saveGameBtn.setOnAction(_ -> handleSave());
         loadGameBtn.setOnAction(_ -> handleLoad());
@@ -90,35 +87,35 @@ public class MainWindowController {
         themesBtn.setOnAction(_ -> handleThemes());
         aboutBtn.setOnAction(_ -> handleAbout());
         exitBtn.setOnAction(_ -> handleExit());
-
-        //link numbered buttons to the handleButtonInput method
         numberButtons.getChildren().forEach(button -> button.setOnMouseClicked(this::handleButtonInput));
-        setupTimer();
     }
 
-    public void setupGrid(){
-        //initialize and populate the grid
+    public void setupGrid() {
         gridPanelView = new GridPanelView(puzzleController.getPuzzle(), this);
-        // Add focus listeners to all TextFields in the GridPane
-        for (javafx.scene.Node node : sudokuGrid.getChildren()) {
+        addFocusListenersToGrid();
+        setupAvailableHintsListener();
+    }
+
+    private void addFocusListenersToGrid() {
+        sudokuGrid.getChildren().forEach(node -> {
             if (node instanceof TextField textField) {
                 textField.focusedProperty().addListener((_, _, newValue) -> {
                     if (newValue) {
-                        lastFocused = textField; // Update the last focused TextField
+                        lastFocused = textField;
                     }
                 });
             }
-        }
+        });
+    }
 
-        // Create a listener for the number of available hints
+    private void setupAvailableHintsListener() {
         puzzleController.getPuzzle().availableHintsProperty().addListener((_, _, newValue) -> {
             availableHintsLabel.setText("Available Hints: " + newValue);
             showHintBtn.setDisable(newValue.intValue() == 0);
         });
-
-        // Initialize the available hints label
         availableHintsLabel.setText("Available Hints: " + puzzleController.getPuzzle().getAvailableHints());
     }
+
     private void setupTimer() {
         timer = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateTimer()));
         timer.setCycleCount(Timeline.INDEFINITE);
@@ -142,9 +139,15 @@ public class MainWindowController {
     }
 
     private void handleNewGame(MenuItem item) {
-        // Handle new game based on difficulty
         String difficulty = item.getText();
-        // Call the corresponding function to start a new game with the selected difficulty
+        startNewGameWithDifficulty(difficulty);
+        gridPanelView.setPuzzle(puzzleController.getPuzzle());
+        enableGameButtons();
+        setupAvailableHintsListener();
+        startTimer();
+    }
+
+    private void startNewGameWithDifficulty(String difficulty) {
         switch (difficulty) {
             case "Novice":
                 puzzleController.startNewGame(1);
@@ -162,48 +165,34 @@ public class MainWindowController {
                 puzzleController.startNewGame(5);
                 break;
         }
-        gridPanelView.setPuzzle(puzzleController.getPuzzle());
-        //restart the timer
-        //enable undo/redo buttons
+    }
+
+    private void enableGameButtons() {
         undoBtn.setDisable(false);
         redoBtn.setDisable(false);
         resetBtn.setDisable(false);
         showHintBtn.setDisable(false);
-        // Reset the available hints label and show hint button
-        puzzleController.getPuzzle().availableHintsProperty().addListener((_, _, newValue) -> {
-            availableHintsLabel.setText("Available Hints: " + newValue);
-            showHintBtn.setDisable(newValue.intValue() == 0);
-        });
-
-        // Initialize the available hints label
-        availableHintsLabel.setText("Available Hints: " + puzzleController.getPuzzle().getAvailableHints());
-
-        startTimer();
     }
 
     private void handleSave() {
-        //open a new window to input the name of the saved game
-        // Call the corresponding function to save the current game state
-        try{
+        try {
             repository.load();
-            Window window = saveGameBtn.getScene().getWindow();
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.initOwner(window);
-            dialog.setTitle("Save Game");
-            dialog.setHeaderText("Enter the name of the saved game");
-            dialog.setContentText("Name:");
-            dialog.showAndWait().ifPresent(name -> {
-                puzzleController.updatePuzzle(name);
-                repository.addPuzzleState(puzzleController.getPuzzle());
-                repository.save();
-            });
-        }catch (IllegalArgumentException _){}
+        } catch (IllegalArgumentException ignored) {}
+        Window window = saveGameBtn.getScene().getWindow();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.initOwner(window);
+        dialog.setTitle("Save Game");
+        dialog.setHeaderText("Enter the name of the saved game");
+        dialog.setContentText("Name:");
+        dialog.showAndWait().ifPresent(name -> {
+            puzzleController.updatePuzzle(name);
+            repository.addPuzzleState(puzzleController.getPuzzle());
+            repository.save();
+        });
     }
 
     private void handleLoad() {
-        // Handle load game --> open a new window with a list view of the saved games from the file
-        // Call the corresponding function to load a saved game state
-        try{
+        try {
             repository.load();
             Window window = loadGameBtn.getScene().getWindow();
             ChoiceDialog<Puzzle> dialog = new ChoiceDialog<>();
@@ -217,7 +206,7 @@ public class MainWindowController {
                 gridPanelView.setPuzzle(puzzle);
                 setupGrid();
             });
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait();
         }
     }
@@ -243,56 +232,53 @@ public class MainWindowController {
     }
 
     private void handleShowHint() {
-
         puzzleController.giveHint();
         availableHintsLabel.setText("Available Hints: " + puzzleController.getPuzzle().getAvailableHints());
     }
 
     private void handleCheckSolution() {
         gridPanelView.showSolution();
-        //disable undo/redo buttons
+        disableGameButtons();
+        stopTimer();
+    }
+
+    private void disableGameButtons() {
         undoBtn.setDisable(true);
         redoBtn.setDisable(true);
         resetBtn.setDisable(true);
         showHintBtn.setDisable(true);
-        //stop the timer
-        stopTimer();
     }
 
     private void handleThemes() {
         // Handle themes
-        // Call the corresponding function to change the theme
     }
 
     private void handleAbout() {
-        //open the about window and load the text from the about.txt file
         Window window = aboutBtn.getScene().getWindow();
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.initOwner(window);
         alert.setTitle("About");
         alert.setHeaderText("Sudoku Game");
-
-        try{
-            FileReader file = new FileReader("about.txt");
-            BufferedReader reader = new BufferedReader(file);
-            StringBuilder sb = new StringBuilder();
-            String line = reader.readLine();
-            while (line != null) {
-                sb.append(line).append("\n");
-                line = reader.readLine();
-            }
-            alert.setContentText(sb.toString());
-        } catch (FileNotFoundException e)
-        {
-            alert.setContentText("The about.txt file could not be found");
-        } catch (IOException e) {
-            alert.setContentText("An error occurred while reading the about.txt file");
-        }
-
+        alert.setContentText(readAboutFile());
         alert.resizableProperty().setValue(true);
         alert.getDialogPane().setPrefWidth(700);
         alert.getDialogPane().setPrefHeight(600);
         alert.showAndWait();
+    }
+
+    private String readAboutFile() {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader("about.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (FileNotFoundException e) {
+            return "The about.txt file could not be found";
+        } catch (IOException e) {
+            return "An error occurred while reading the about.txt file";
+        }
+        return sb.toString();
     }
 
     private void handleExit() {
@@ -302,44 +288,29 @@ public class MainWindowController {
         alert.setTitle("Exit");
         alert.setHeaderText("Are you sure you want to exit? Any unsaved progress will be lost.");
         alert.setContentText("Choose your option:");
-        ButtonType save = new ButtonType("Save");
-        ButtonType exit = new ButtonType("Exit");
-        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(cancel, save, exit);
-
+        alert.getButtonTypes().setAll(
+                new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE),
+                new ButtonType("Save"),
+                new ButtonType("Exit")
+        );
         alert.showAndWait().ifPresent(buttonType -> {
-            if (buttonType == save) {
+            if (buttonType.getText().equals("Save")) {
                 handleSave();
                 System.exit(0);
-            } else if (buttonType == exit) {
+            } else if (buttonType.getText().equals("Exit")) {
                 System.exit(0);
             }
         });
     }
 
-    //TODO: themes
-    //TODO: CSS styling --> dark mode, light mode, custom themes
-    //TODO: themes --> light, dark, purple, blue, green, yellow, orange, pink
-    //TODO: background color, button/controlls color, clear button text color, text field color, text color, editable text field color
-    //TODO: add separator lines between the 3x3 blocks, highlight the selected cell, highlight the row and column of the selected cell
-    //TODO: fix mouse event on typing --> sanitize the input on keypress, update the puzzle state on key release
-    //TODO: redesign the menu bar --> group buttons together
-    //TODO: implement the new game functionality + dialog windows for saving the current game
-    //TODO: redesign the start window --> add a new game button, load game button, about button, exit button
-    // the first window closes after the user selects a new game or loads a game --> the game window opens
-
-    //TODO: add extra checks for the validity of the input, add unit tests for everything
-
     private void handleButtonInput(Event event) {
         Button source = (Button) event.getSource();
-
         if (source.getText().equals("X")) {
             if (lastFocused != null) {
                 lastFocused.clear();
             }
-            return; // Exit early after clearing the text field
+            return;
         }
-
         int value = Integer.parseInt(source.getText());
         if (lastFocused != null && lastFocused.isEditable()) {
             int row = GridPane.getRowIndex(lastFocused);
@@ -350,48 +321,38 @@ public class MainWindowController {
         }
     }
 
-
     public void handleArrowKeys(KeyEvent event) {
         TextField source = (TextField) event.getSource();
         int row = GridPane.getRowIndex(source);
         int col = GridPane.getColumnIndex(source);
-
         switch (event.getCode()) {
-            case UP:
-                if (row > 0) { sudokuGrid.getChildren().get((row - 1) * 9 + col + 1).requestFocus(); }
-                break;
-            case DOWN:
-                if (row < 8) { sudokuGrid.getChildren().get((row + 1) * 9 + col + 1).requestFocus(); }
-                break;
-            case LEFT:
-                if (col > 0) { sudokuGrid.getChildren().get(row * 9 + col).requestFocus(); }
-                break;
-            case RIGHT:
-                if (col < 8) { sudokuGrid.getChildren().get(row * 9 + col + 2).requestFocus(); }
-                break;
-            default:
-                break;
+            case UP -> moveFocus(row - 1, col);
+            case DOWN -> moveFocus(row + 1, col);
+            case LEFT -> moveFocus(row, col - 1);
+            case RIGHT -> moveFocus(row, col + 1);
+            default -> {}
+        }
+    }
+
+    private void moveFocus(int row, int col) {
+        if (row >= 0 && row < 9 && col >= 0 && col < 9) {
+            sudokuGrid.getChildren().get(row * 9 + col + 1).requestFocus();
         }
     }
 
     public void handleCellInput(Event event) {
-
         TextField source = (TextField) event.getSource();
         source.requestFocus();
         int row = GridPane.getRowIndex(source);
         int col = GridPane.getColumnIndex(source);
-
-        //if the value is non-numeric, clear the cell
         if (source.getText().isEmpty() || !source.getText().matches("[0-9]")) {
             source.clear();
             event.consume();
             return;
         }
-
-        if (source.isEditable()){
+        if (source.isEditable()) {
             int value = Integer.parseInt(source.getText());
             puzzleController.addCell(row, col, value);
-            System.out.print(source.getText());
         }
     }
 
