@@ -27,10 +27,9 @@ public class SudokuApplication extends Application {
         IRepository repository = new Repository("saved_games.xml");
 
         SolutionGrid solutionGrid = new SolutionGrid();
-        //solutionGrid.populate();
         PuzzleGrid puzzleGrid = new PuzzleGrid(solutionGrid, 3);
-        //puzzleGrid.populate();
         Puzzle puzzle = new Puzzle(puzzleGrid, solutionGrid, "New Game");
+
         // Create a new PuzzleController instance
         PuzzleController puzzleController = new PuzzleController(puzzle);
 

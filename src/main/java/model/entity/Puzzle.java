@@ -9,21 +9,14 @@ import org.w3c.dom.Element;
 
 
 public class Puzzle {
-    private SolutionGrid solutionGrid;
-    private CompletedGrid completedGrid;
+    private final SolutionGrid solutionGrid;
+    private final CompletedGrid completedGrid;
     private boolean isSolved;
     private boolean pencilMode;
     private String name;
-    private String dateTime;
-    private SimpleIntegerProperty availableHints = new SimpleIntegerProperty(0);
+    private String dateTime; // Date and time of creation/last modification
+    private final SimpleIntegerProperty availableHints = new SimpleIntegerProperty(0);
 
-    //TODO: A puzzle state should aggregate a PuzzleGrid, a SolutionGrid and a List of entries
-    //TODO: A puzzle state should have a method to check if the puzzle is solved
-    //TODO: A puzzle state should have a method to save the current state to a string
-    //TODO: A puzzle state should have a method to load a state from a string
-    //State --> PuzzleGrid, SolutionGrid, isSolved, pencilMode(?)
-    // save, load, display state, display solution, reset, reverse(undo), redo
-    // name, date and time of creation/last modification
 
     public Puzzle() {
         this.solutionGrid = new SolutionGrid();
@@ -66,32 +59,30 @@ public class Puzzle {
         completedGrid.setCell(row, col, value);
     }
 
-    public boolean isSolved() {
-        int[][] puzzle = completedGrid.getPuzzleGrid().getGrid();
-        int[][] solution = solutionGrid.getGrid();
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (puzzle[i][j] != solution[i][j]) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+//    public boolean isSolved() {
+//        int[][] puzzle = completedGrid.getPuzzleGrid().getGrid();
+//        int[][] solution = solutionGrid.getGrid();
+//        for (int i = 0; i < 9; i++) {
+//            for (int j = 0; j < 9; j++) {
+//                if (puzzle[i][j] != solution[i][j]) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
 
     public String saveState() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<puzzle>\n");
-        sb.append("  <puzzle_grid>\n").append(completedGrid.getPuzzleGrid().toXML()).append("  </puzzle_grid>\n");
-        sb.append("  <solution_grid>\n").append(solutionGrid.toXML()).append("  </solution_grid>\n");
-        sb.append("  <completed_grid>\n").append(completedGrid.toXML()).append("  </completed_grid>\n");
-        sb.append("  <is_solved>").append(isSolved).append("</is_solved>\n");
-        sb.append("  <pencil_mode>").append(pencilMode).append("</pencil_mode>\n");
-        sb.append("  <name>").append(name).append("</name>\n");
-        sb.append("  <date_time>").append(dateTime).append("</date_time>\n");
-        sb.append("  <available_hints>").append(availableHints.get()).append("</available_hints>\n");
-        sb.append("</puzzle>\n");
-        return sb.toString();
+        return "<puzzle>\n" +
+                "  <puzzle_grid>\n" + completedGrid.getPuzzleGrid().toXML() + "  </puzzle_grid>\n" +
+                "  <solution_grid>\n" + solutionGrid.toXML() + "  </solution_grid>\n" +
+                "  <completed_grid>\n" + completedGrid.toXML() + "  </completed_grid>\n" +
+                "  <is_solved>" + isSolved + "</is_solved>\n" +
+                "  <pencil_mode>" + pencilMode + "</pencil_mode>\n" +
+                "  <name>" + name + "</name>\n" +
+                "  <date_time>" + dateTime + "</date_time>\n" +
+                "  <available_hints>" + availableHints.get() + "</available_hints>\n" +
+                "</puzzle>\n";
     }
 
     public void loadState(Element element) {
@@ -108,50 +99,6 @@ public class Puzzle {
     private int[][] parseGrid(Element parent, String tagName) {
         Element gridElement = (Element) parent.getElementsByTagName(tagName).item(0);
         return completedGrid.fromXML(gridElement.getTextContent());
-    }
-
-    private String getElementText(Element parent, String tagName) {
-        return parent.getElementsByTagName(tagName).item(0).getTextContent();
-    }
-
-    // Getters and setters for the fields
-    public SolutionGrid getSolutionGrid() { return solutionGrid; }
-    public CompletedGrid getCompletedGrid() { return completedGrid; }
-//    public boolean getIsSolved() { return isSolved; }
-//    public boolean getPencilMode() { return pencilMode; }
-//    public String getName() { return name; }
-//    public String getDateTime() { return dateTime; }
-
-    public void setName(String name) { this.name = name; }
-//    public void setSolutionGrid(SolutionGrid sg) { solutionGrid = sg; }
-//    public void setCompletedGrid(CompletedGrid cg) { completedGrid = cg; }
-//    public void setIsSolved(boolean solved) { isSolved = solved; }
-//    public void setPencilMode(boolean pencil) { pencilMode = pencil; }
-    public void setDateTime() {
-        this.dateTime = java.time.LocalDate.now() +
-                " " +
-                java.time.LocalTime.now();
-    }
-
-//    public Puzzle deepCopy() {
-//        Puzzle copy = new Puzzle();
-//        copy.setSolutionGrid(solutionGrid.deepCopy());
-//        copy.setCompletedGrid(completedGrid.deepCopy());
-//        copy.setIsSolved(isSolved);
-//        copy.setPencilMode(pencilMode);
-//        copy.setName(name);
-//        copy.setDateTime();
-//        copy.setAvailableHints(availableHints.get());
-//        return copy;
-//    }
-
-    public int getCell(int row, int col) {
-        return completedGrid.getCell(row, col);
-    }
-
-    public String toString() {
-        return "Name: " + name + "\n" +
-                "Datetime: " + dateTime + "\n";
     }
 
     public void giveHint(){
@@ -173,11 +120,27 @@ public class Puzzle {
 
         this.availableHints.set(availableHints.get() - 1);
     }
-//    public void setAvailableHints(int availableHints){
-//        this.availableHints.set(availableHints);
-//    }
-    public int getAvailableHints(){
-        return availableHints.get();
+
+    private String getElementText(Element parent, String tagName) {
+        return parent.getElementsByTagName(tagName).item(0).getTextContent();
+    }
+
+    // Getters and setters for the fields
+    public SolutionGrid getSolutionGrid() { return solutionGrid; }
+    public CompletedGrid getCompletedGrid() { return completedGrid; }
+    public int getCell(int row, int col) { return completedGrid.getCell(row, col); }
+    public int getAvailableHints(){ return availableHints.get(); }
+
+    public void setName(String name) { this.name = name; }
+    public void setDateTime() {
+        this.dateTime = java.time.LocalDate.now() +
+                " " +
+                java.time.LocalTime.now();
+    }
+
+    public String toString() {
+        return "Name: " + name + "\n" +
+                "Datetime: " + dateTime + "\n";
     }
 
     public IntegerProperty availableHintsProperty() {

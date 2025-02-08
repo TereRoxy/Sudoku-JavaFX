@@ -3,22 +3,16 @@ package model.grid;
 import model.adt.Pair;
 
 import java.util.Map;
-import java.util.StringTokenizer;
 
-public class PuzzleGrid implements IGrid {
-    private int[][] grid;
+public class PuzzleGrid extends Grid {
+    //private final int[][] grid;
     private int deletionSymmetry;
     private int nrTargetCells;
     private int nrHints;
     private SolutionGrid solution;
 
     public PuzzleGrid(){
-        grid = new int[9][9];
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
-                grid[i][j] = 0;
-            }
-        }
+        super();
     } //to be used only when deserializing
 
     public PuzzleGrid(SolutionGrid solutionGrid, int difficulty){
@@ -42,21 +36,12 @@ public class PuzzleGrid implements IGrid {
     }
 
     //generate the puzzle grid by deleting cells from the solution grid
-    private void populate() {
-        //TODO: add unique solution constraint, revert to previous grid if multiple solutions are found
-        //TODO: add uniform distribution of missing cells across the grid
+    public void populate() {
         int nrDeletedCells = 0;
         int nrTries = 0;
         //select the rotation degree for the rotational symmetry
         int rotation = (int)(Math.random() * 3 + 1);
 
-        //initialize regions
-//        int cubltes[][] = new int[3][3];
-//        for(int i = 0; i < 3; i++){
-//            for(int j = 0; j < 3; j++){
-//                cubltes[i][j] = 0;
-//            }
-//        }
 
         //if we've tried too many times, we should stop (too little constraints for unique solution or choosing the same cell too many times)
         while(nrDeletedCells < nrTargetCells && nrTries < 1000){
@@ -107,47 +92,6 @@ public class PuzzleGrid implements IGrid {
         }
     }
 
-    @Override
-    public int[][] getGrid() {
-        return grid;
-    }
-
-    @Override
-    public void setGrid(int[][] grid) {
-        this.grid = grid;
-    }
-
-    @Override
-    public String toXML() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("    <grid>\n");
-        for (int[] row : grid) {
-            sb.append("      <row>");
-            for (int cell : row) {
-                sb.append(cell).append(" ");
-            }
-            sb.deleteCharAt(sb.length() - 1); // Remove trailing space
-            sb.append("</row>\n");
-        }
-        sb.append("    </grid>\n");
-        return sb.toString();
-    }
-
-    @Override
-    public int[][] fromXML(String xml) {
-        int[][] newGrid = new int[9][9];
-        String[] rows = xml.trim().split("\n");
-
-        for (int i = 0; i < 9; i++) {
-            String row = rows[i].replace("<row>", "").replace("</row>", "").trim();
-            String[] cells = row.split(" ");
-            for (int j = 0; j < 9; j++) {
-                newGrid[i][j] = Integer.parseInt(cells[j]);
-            }
-        }
-        return newGrid;
-    }
-
     private Pair<Integer, Integer> getSymmetricCell(int row, int col){
         return switch (deletionSymmetry) {
             case 0 -> new Pair<>(row, col); //no symmetry
@@ -179,35 +123,6 @@ public class PuzzleGrid implements IGrid {
         return 1;
     }
 
-    private boolean isValid(int[][] solutionGrid, int row, int col, int num) {
-        for (int i = 0; i < 9; i++) {
-            if (solutionGrid[row][i] == num || solutionGrid[i][col] == num) {
-                return false;
-            }
-        }
-        int startRow = row - row % 3;
-        int startCol = col - col % 3;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (solutionGrid[startRow + i][startCol + j] == num) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-//    public PuzzleGrid deepCopy(){
-//        PuzzleGrid pg = new PuzzleGrid();
-//        int[][] newGrid = new int[9][9];
-//        for(int i = 0; i < 9; i++){
-//            for(int j = 0; j < 9; j++){
-//                newGrid[i][j] = grid[i][j];
-//            }
-//        }
-//        pg.setGrid(newGrid);
-//        return pg;
-//    }
 
     public int getNrHints() {
         return nrHints;
