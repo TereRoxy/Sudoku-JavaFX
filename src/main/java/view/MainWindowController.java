@@ -184,35 +184,42 @@ public class MainWindowController {
     private void handleSave() {
         //open a new window to input the name of the saved game
         // Call the corresponding function to save the current game state
-        Window window = saveGameBtn.getScene().getWindow();
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.initOwner(window);
-        dialog.setTitle("Save Game");
-        dialog.setHeaderText("Enter the name of the saved game");
-        dialog.setContentText("Name:");
-        dialog.showAndWait().ifPresent(name -> {
-            puzzleController.getPuzzle().setName(name);
-            repository.addPuzzleState(puzzleController.getPuzzle());
-            repository.save();
-        });
+        try{
+            repository.load();
+            Window window = saveGameBtn.getScene().getWindow();
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.initOwner(window);
+            dialog.setTitle("Save Game");
+            dialog.setHeaderText("Enter the name of the saved game");
+            dialog.setContentText("Name:");
+            dialog.showAndWait().ifPresent(name -> {
+                puzzleController.updatePuzzle(name);
+                repository.addPuzzleState(puzzleController.getPuzzle());
+                repository.save();
+            });
+        }catch (IllegalArgumentException _){}
     }
 
     private void handleLoad() {
         // Handle load game --> open a new window with a list view of the saved games from the file
         // Call the corresponding function to load a saved game state
-        repository.load();
-        Window window = loadGameBtn.getScene().getWindow();
-        ChoiceDialog<Puzzle> dialog = new ChoiceDialog<>();
-        dialog.initOwner(window);
-        dialog.setTitle("Load Game");
-        dialog.setHeaderText("Select a saved game to load");
-        dialog.setContentText("Saved Games:");
-        dialog.getItems().addAll(repository.getPuzzleStates());
-        dialog.showAndWait().ifPresent(puzzle -> {
-            puzzleController.setPuzzle(puzzle);
-            gridPanelView.setPuzzle(puzzle);
-            setupGrid();
-        });
+        try{
+            repository.load();
+            Window window = loadGameBtn.getScene().getWindow();
+            ChoiceDialog<Puzzle> dialog = new ChoiceDialog<>();
+            dialog.initOwner(window);
+            dialog.setTitle("Load Game");
+            dialog.setHeaderText("Select a saved game to load");
+            dialog.setContentText("Saved Games:");
+            dialog.getItems().addAll(repository.getPuzzleStates());
+            dialog.showAndWait().ifPresent(puzzle -> {
+                puzzleController.setPuzzle(puzzle);
+                gridPanelView.setPuzzle(puzzle);
+                setupGrid();
+            });
+        }catch (IllegalArgumentException e){
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait();
+        }
     }
 
     private void handleUndo() {
@@ -308,19 +315,14 @@ public class MainWindowController {
                 System.exit(0);
             }
         });
-
-        //close the window
-        System.exit(0);
     }
 
-    //TODO: implement remaining hints(listener), remaining cells(?)
-    //TODO: implement, show hint, themes
+    //TODO: themes
     //TODO: CSS styling --> dark mode, light mode, custom themes
     //TODO: themes --> light, dark, purple, blue, green, yellow, orange, pink
     //TODO: background color, button/controlls color, clear button text color, text field color, text color, editable text field color
     //TODO: add separator lines between the 3x3 blocks, highlight the selected cell, highlight the row and column of the selected cell
     //TODO: fix mouse event on typing --> sanitize the input on keypress, update the puzzle state on key release
-    //TODO: rewrite json save/load
     //TODO: redesign the menu bar --> group buttons together
     //TODO: implement the new game functionality + dialog windows for saving the current game
     //TODO: redesign the start window --> add a new game button, load game button, about button, exit button
@@ -339,7 +341,7 @@ public class MainWindowController {
         }
 
         int value = Integer.parseInt(source.getText());
-        if (lastFocused != null) {
+        if (lastFocused != null && lastFocused.isEditable()) {
             int row = GridPane.getRowIndex(lastFocused);
             int col = GridPane.getColumnIndex(lastFocused);
             lastFocused.setText(String.valueOf(value));
@@ -368,7 +370,6 @@ public class MainWindowController {
                 if (col < 8) { sudokuGrid.getChildren().get(row * 9 + col + 2).requestFocus(); }
                 break;
             default:
-                handleCellInputSanitize(event);
                 break;
         }
     }
@@ -379,24 +380,18 @@ public class MainWindowController {
         source.requestFocus();
         int row = GridPane.getRowIndex(source);
         int col = GridPane.getColumnIndex(source);
-        System.out.print(source.getText());
 
         //if the value is non-numeric, clear the cell
         if (source.getText().isEmpty() || !source.getText().matches("[0-9]")) {
             source.clear();
+            event.consume();
             return;
         }
-        int value = Integer.parseInt(source.getText());
 
-        puzzleController.addCell(row, col, value);
-    }
-
-    public void handleCellInputSanitize(Event event) {
-        TextField source = (TextField) event.getSource();
-        String text = source.getText();
-        if (text.isEmpty() || !text.matches("[0-9]")) {
-            source.clear();
-            event.consume();
+        if (source.isEditable()){
+            int value = Integer.parseInt(source.getText());
+            puzzleController.addCell(row, col, value);
+            System.out.print(source.getText());
         }
     }
 

@@ -1,7 +1,12 @@
 package repository;
 
 import model.entity.Puzzle;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +30,9 @@ public class Repository implements IRepository {
     public void addPuzzleState(Puzzle puzzle) {
         puzzles.add(puzzle);
     }
-
     public void removePuzzleState(Puzzle puzzle) {
         puzzles.remove(puzzle);
     }
-
     public Puzzle getPuzzleState(int index) {
         return puzzles.get(index);
     }
@@ -41,17 +44,12 @@ public class Repository implements IRepository {
     @Override
     public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write("[\n");
-            for (int i = 0; i < puzzles.size(); i++) {
-                String puzzleJson = puzzles.get(i).saveState();
-                // Add indentation to each line
-                puzzleJson = puzzleJson.replace("\n", "\n    ");
-                writer.write("    " + puzzleJson);
-                if (i < puzzles.size() - 1) {
-                    writer.write(",\n");
-                }
+            writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            writer.write("<puzzles>\n");
+            for (Puzzle puzzle : puzzles) {
+                writer.write(puzzle.saveState().replace("<", "  <"));
             }
-            writer.write("\n]");
+            writer.write("</puzzles>");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,38 +57,26 @@ public class Repository implements IRepository {
 
     @Override
     public void load() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            List<String> puzzleJsons = new ArrayList<>();
-            StringBuilder currentPuzzle = new StringBuilder();
-            int braceCount = 0;
-            String line;
+        File file = new File(fileName);
+        if (file.length() == 0) {
+            throw new IllegalArgumentException("File is empty. Nothing to load.");
+        }
 
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("{")) {
-                    currentPuzzle = new StringBuilder();
-                    braceCount = 0;
-                }
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File(fileName));
 
-                for (char c : line.toCharArray()) {
-                    if (c == '{') braceCount++;
-                    if (c == '}') braceCount--;
-                }
-
-                currentPuzzle.append(line);
-
-                if (braceCount == 0 && line.endsWith("}")) {
-                    puzzleJsons.add(currentPuzzle.toString());
-                }
-            }
-
+            NodeList puzzleNodes = doc.getElementsByTagName("puzzle");
             puzzles.clear();
-            for (String json : puzzleJsons) {
+
+            for (int i = 0; i < puzzleNodes.getLength(); i++) {
+                Element puzzleElement = (Element) puzzleNodes.item(i);
                 Puzzle puzzle = new Puzzle();
-                puzzle.loadState(json);
+                puzzle.loadState(puzzleElement);
                 puzzles.add(puzzle);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -78,67 +78,32 @@ public class SolutionGrid implements IGrid {
         return grid;
     }
 
-//    @Override
-//    public String toJSON(){
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("[\n");
-//        for(int i = 0; i < 9; i++){
-//            sb.append("\t[");
-//            for(int j = 0; j < 9; j++){
-//                sb.append(grid[i][j]);
-//                if(j < 8){
-//                    sb.append(", ");
-//                }
-//            }
-//            sb.append("]");
-//            if(i < 8){
-//                sb.append(",");
-//            }
-//            sb.append("\n");
-//        }
-//        sb.append("]");
-//        return sb.toString();
-//    }
-//
-//    @Override
-//    public int[][] fromJSON(String grid) {
-//        //json parser
-//        StringTokenizer st = new StringTokenizer(grid, "[],\n");
-//        int[][] newGrid = new int[9][9];
-//        for(int i = 0; i < 9; i++){
-//            for(int j = 0; j < 9; j++){
-//                newGrid[i][j] = Integer.parseInt(st.nextToken());
-//            }
-//        }
-//        return newGrid;
-//    }
-
     @Override
-    public String toJSON() {
+    public String toXML() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[\n");
-        for (int i = 0; i < 9; i++) {
-            sb.append("  [");
-            for (int j = 0; j < 9; j++) {
-                sb.append(grid[i][j]);
-                if (j < 8) sb.append(", ");
+        sb.append("    <grid>\n");
+        for (int[] row : grid) {
+            sb.append("      <row>");
+            for (int cell : row) {
+                sb.append(cell).append(" ");
             }
-            sb.append("]");
-            if (i < 8) sb.append(",\n");
+            sb.deleteCharAt(sb.length() - 1); // Remove trailing space
+            sb.append("</row>\n");
         }
-        sb.append("\n]");
+        sb.append("    </grid>\n");
         return sb.toString();
     }
 
     @Override
-    public int[][] fromJSON(String json) {
+    public int[][] fromXML(String xml) {
         int[][] newGrid = new int[9][9];
-        StringTokenizer st = new StringTokenizer(json, "[], \n");
+        String[] rows = xml.trim().split("\n");
+
         for (int i = 0; i < 9; i++) {
+            String row = rows[i].replace("<row>", "").replace("</row>", "").trim();
+            String[] cells = row.split(" ");
             for (int j = 0; j < 9; j++) {
-                if (st.hasMoreTokens()) {
-                    newGrid[i][j] = Integer.parseInt(st.nextToken());
-                }
+                newGrid[i][j] = Integer.parseInt(cells[j]);
             }
         }
         return newGrid;

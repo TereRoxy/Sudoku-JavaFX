@@ -3,11 +3,10 @@ package model.entity;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import model.grid.CompletedGrid;
-import model.grid.IGrid;
 import model.grid.PuzzleGrid;
 import model.grid.SolutionGrid;
+import org.w3c.dom.Element;
 
-import java.util.StringTokenizer;
 
 public class Puzzle {
     private SolutionGrid solutionGrid;
@@ -81,49 +80,39 @@ public class Puzzle {
     }
 
     public String saveState() {
-        return "{\n" +
-                "  \"puzzle_grid\": " + formatGrid(completedGrid.getPuzzleGrid()) + ",\n" +
-                "  \"solution_grid\": " + formatGrid(solutionGrid) + ",\n" +
-                "  \"completed_grid\": " + formatGrid(completedGrid) + ",\n" +
-                "  \"is_solved\": " + isSolved + ",\n" +
-                "  \"pencil_mode\": " + pencilMode + ",\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"date_time\": \"" + dateTime + "\",\n" +
-                "  \"available_hints\": " + availableHints.get() + "\n" +
-                "}";
+        StringBuilder sb = new StringBuilder();
+        sb.append("<puzzle>\n");
+        sb.append("  <puzzle_grid>\n").append(completedGrid.getPuzzleGrid().toXML()).append("  </puzzle_grid>\n");
+        sb.append("  <solution_grid>\n").append(solutionGrid.toXML()).append("  </solution_grid>\n");
+        sb.append("  <completed_grid>\n").append(completedGrid.toXML()).append("  </completed_grid>\n");
+        sb.append("  <is_solved>").append(isSolved).append("</is_solved>\n");
+        sb.append("  <pencil_mode>").append(pencilMode).append("</pencil_mode>\n");
+        sb.append("  <name>").append(name).append("</name>\n");
+        sb.append("  <date_time>").append(dateTime).append("</date_time>\n");
+        sb.append("  <available_hints>").append(availableHints.get()).append("</available_hints>\n");
+        sb.append("</puzzle>\n");
+        return sb.toString();
     }
 
-    private String formatGrid(IGrid grid) {
-        String json = grid.toJSON();
-        return json.replace("],[", "],\n    [");
+    public void loadState(Element element) {
+        completedGrid.getPuzzleGrid().setGrid(parseGrid(element, "puzzle_grid"));
+        solutionGrid.setGrid(parseGrid(element, "solution_grid"));
+        completedGrid.setGrid(parseGrid(element, "completed_grid"));
+        isSolved = Boolean.parseBoolean(getElementText(element, "is_solved").trim());
+        pencilMode = Boolean.parseBoolean(getElementText(element, "pencil_mode").trim());
+        name = getElementText(element, "name");
+        dateTime = getElementText(element, "date_time");
+        availableHints.set(Integer.parseInt(getElementText(element, "available_hints").trim()));
     }
 
-    public void loadState(String state) {
-        StringTokenizer st = new StringTokenizer(state, "{},\n\": ");
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            switch (token) {
-                case "puzzle_grid" -> {
-                    int[][] puzzleGrid = completedGrid.getPuzzleGrid().fromJSON(st.nextToken());
-                    completedGrid.setGrid(puzzleGrid);
-                }
-                case "solution_grid" -> {
-                    int[][] solutionGrid = this.solutionGrid.fromJSON(st.nextToken());
-                    this.solutionGrid.setGrid(solutionGrid);
-                }
-                case "completed_grid" -> {
-                    int[][] completedGrid = this.completedGrid.fromJSON(st.nextToken());
-                    this.completedGrid.setGrid(completedGrid);
-                }
-                case "is_solved" -> isSolved = Boolean.parseBoolean(st.nextToken());
-                case "pencil_mode" -> pencilMode = Boolean.parseBoolean(st.nextToken());
-                case "name" -> name = st.nextToken();
-                case "date_time" -> dateTime = st.nextToken();
-                case "available_hints" -> availableHints.set(Integer.parseInt(st.nextToken()));
-            }
-        }
+    private int[][] parseGrid(Element parent, String tagName) {
+        Element gridElement = (Element) parent.getElementsByTagName(tagName).item(0);
+        return completedGrid.fromXML(gridElement.getTextContent());
     }
 
+    private String getElementText(Element parent, String tagName) {
+        return parent.getElementsByTagName(tagName).item(0).getTextContent();
+    }
 
     // Getters and setters for the fields
     public SolutionGrid getSolutionGrid() { return solutionGrid; }
@@ -138,11 +127,11 @@ public class Puzzle {
 //    public void setCompletedGrid(CompletedGrid cg) { completedGrid = cg; }
 //    public void setIsSolved(boolean solved) { isSolved = solved; }
 //    public void setPencilMode(boolean pencil) { pencilMode = pencil; }
-//    public void setDateTime() {
-//        this.dateTime = java.time.LocalDate.now() +
-//                " " +
-//                java.time.LocalTime.now();
-//    }
+    public void setDateTime() {
+        this.dateTime = java.time.LocalDate.now() +
+                " " +
+                java.time.LocalTime.now();
+    }
 
 //    public Puzzle deepCopy() {
 //        Puzzle copy = new Puzzle();

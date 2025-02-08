@@ -90,4 +90,9 @@ public class PuzzleController {
     public void giveHint(){
         puzzle.giveHint();
     }
+
+    public void updatePuzzle(String name){
+        puzzle.setName(name);
+        puzzle.setDateTime();
+    }
 }
