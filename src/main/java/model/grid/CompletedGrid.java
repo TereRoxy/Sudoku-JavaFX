@@ -2,6 +2,7 @@ package model.grid;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+
 import java.util.StringTokenizer;
 
 public class CompletedGrid implements IGrid {
@@ -39,106 +40,41 @@ public class CompletedGrid implements IGrid {
         }
     }
 
-    public IntegerProperty getCellProperty(int row, int col) {
-        return grid[row][col]; // Return the IntegerProperty for binding
-    }
-
-
-//    @Override
-//    public String toJSON(){
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("[\n");
-//        for(int i = 0; i < 9; i++){
-//            sb.append("\t[");
-//            for(int j = 0; j < 9; j++){
-//                sb.append(grid[i][j].get());
-//                if(j < 8){
-//                    sb.append(", ");
-//                }
-//            }
-//            sb.append("]");
-//            if(i < 8){
-//                sb.append(",");
-//            }
-//            sb.append("\n");
-//        }
-//        sb.append("]");
-//        return sb.toString();
-//    }
-//
-//    @Override
-//    public int[][] fromJSON(String grid) {
-//        StringTokenizer st = new StringTokenizer(grid, "[],\n");
-//        int[][] newGrid = new int[9][9];
-//        for (int i = 0; i < 9; i++) {
-//            for (int j = 0; j < 9; j++) {
-//                newGrid[i][j] = Integer.parseInt(st.nextToken());
-//            }
-//        }
-//        return newGrid;
-//    }
-
-//    @Override
-//    public String toJSON() {
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("[\n");
-//        for (int i = 0; i < 9; i++) {
-//            sb.append("  [");
-//            for (int j = 0; j < 9; j++) {
-//                sb.append(grid[i][j]);
-//                if (j < 8) sb.append(", ");
-//            }
-//            sb.append("]");
-//            if (i < 8) sb.append(",\n");
-//        }
-//        sb.append("\n]");
-//        return sb.toString();
-//    }
-//
-//    @Override
-//    public int[][] fromJSON(String json) {
-//        int[][] newGrid = new int[9][9];
-//        StringTokenizer st = new StringTokenizer(json, "[], \n");
-//        for (int i = 0; i < 9; i++) {
-//            for (int j = 0; j < 9; j++) {
-//                if (st.hasMoreTokens()) {
-//                    newGrid[i][j] = Integer.parseInt(st.nextToken());
-//                }
-//            }
-//        }
-//        return newGrid;
-//    }
-
     @Override
-    public String toJSON() {
+    public String toXML() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[\n");
-        for (int i = 0; i < 9; i++) {
-            sb.append("  [");
-            for (int j = 0; j < 9; j++) {
-                sb.append(grid[i][j].get());
-                if (j < 8) sb.append(", ");
+        sb.append("    <grid>\n");
+        for (IntegerProperty[] row : grid) {
+            sb.append("      <row>");
+            for (IntegerProperty cell : row) {
+                sb.append(cell.get()).append(" ");
             }
-            sb.append("]");
-            sb.append(i < 8 ? ",\n" : "\n");
+            sb.deleteCharAt(sb.length() - 1); // Remove trailing space
+            sb.append("</row>\n");
         }
-        sb.append("]");
+        sb.append("    </grid>\n");
         return sb.toString();
     }
 
     @Override
-    public int[][] fromJSON(String json) {
+    public int[][] fromXML(String xml) {
         int[][] newGrid = new int[9][9];
-        StringTokenizer st = new StringTokenizer(json, "[], \n");
+        String[] rows = xml.trim().split("\n");
+
         for (int i = 0; i < 9; i++) {
+            String row = rows[i].replace("<row>", "").replace("</row>", "").trim();
+            String[] cells = row.split(" ");
             for (int j = 0; j < 9; j++) {
-                if (st.hasMoreTokens()) {
-                    newGrid[i][j] = Integer.parseInt(st.nextToken());
-                }
+                newGrid[i][j] = Integer.parseInt(cells[j]);
             }
         }
         return newGrid;
     }
+
+    public IntegerProperty getCellProperty(int row, int col) {
+        return grid[row][col]; // Return the IntegerProperty for binding
+    }
+
 
     public void populate() {
         int[][] puzzleGrid = pg.getGrid();

@@ -24,7 +24,7 @@ public class SudokuApplication extends Application {
         MainWindowController controller = fxmlLoader.getController();
 
         // Create instances of PuzzleController and IRepository
-        IRepository repository = new Repository("saved_games.json");
+        IRepository repository = new Repository("saved_games.xml");
 
         SolutionGrid solutionGrid = new SolutionGrid();
         //solutionGrid.populate();

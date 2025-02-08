@@ -3,6 +3,7 @@ package view;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.Cursor;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.util.converter.NumberStringConverter;
 import model.entity.Puzzle;
@@ -32,6 +33,16 @@ public class GridPanelView {
             for (int col = 0; col < 9; col++) {
                 int value = completedGrid[row][col];
                 TextField cell = new TextField();
+
+                // Add a TextFormatter to restrict input to single digits (1-9)
+                TextFormatter<String> textFormatter = new TextFormatter<>(change -> {
+                    String newText = change.getControlNewText();
+                    if (newText.matches("[1-9]?")) { // Allow empty or single digit
+                        return change;
+                    }
+                    return null; // Reject invalid input
+                });
+                cell.setTextFormatter(textFormatter);
 
                 IntegerProperty cellProperty = puzzle.getCellProperty(row, col);
 
@@ -96,6 +107,7 @@ public class GridPanelView {
                 int row = GridPane.getRowIndex(cell);
                 int col = GridPane.getColumnIndex(cell);
                 int value = completedGrid[row][col];
+
                 IntegerProperty cellProperty = puzzle.getCellProperty(row, col);
                 cell.textProperty().bindBidirectional(cellProperty, new NumberStringConverter() {
                     @Override
@@ -133,7 +145,6 @@ public class GridPanelView {
                 int row = GridPane.getRowIndex(cell);
                 int col = GridPane.getColumnIndex(cell);
                 int value = solutionGrid[row][col];
-                cell.setText(String.valueOf(value));
 
                 cell.setEditable(false);
                 cell.setFont(javafx.scene.text.Font.font("Courier New Bold", 20));
@@ -142,6 +153,7 @@ public class GridPanelView {
                 } else {
                     cell.setStyle("-fx-background-color: transparent;");
                 }
+                cell.setText(String.valueOf(value));
             }
         });
     }

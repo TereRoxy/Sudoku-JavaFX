@@ -2,6 +2,7 @@ module view.sudoku {
     requires javafx.controls;
     requires javafx.fxml;
     requires jdk.compiler;
+    requires java.xml;
 
 
     opens view to javafx.fxml;
