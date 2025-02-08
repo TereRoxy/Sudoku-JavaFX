@@ -18,7 +18,7 @@ This project is a Sudoku game implemented in Java using JavaFX for the user inte
 ## Setup
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/sudoku-game.git
+    git clone https://github.com/TereRoxy/Sudoku-JavaFX.git
     cd sudoku-game
     ```
 

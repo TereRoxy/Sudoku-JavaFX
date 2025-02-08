@@ -36,3 +36,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+.mvn
+mvnw
+mvnw.cmd
+maven-wrapper.jar
+pom.xml
+.idea
